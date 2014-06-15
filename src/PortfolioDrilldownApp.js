@@ -85,9 +85,8 @@
           this._getGridStore().then({
             success: function(gridStore) {
               var model = gridStore.model;
-              console.log('getGridStore res');
-              console.log(this.sModelNames, _.last(this.sModelNames));
               gridStore.parentTypes = [_.last(this.sModelNames)];
+              //gridStore.parentTypes = ['portfolioitem/feature'];
               this._addGridBoard(gridStore);
               gridStore.load();
             },
