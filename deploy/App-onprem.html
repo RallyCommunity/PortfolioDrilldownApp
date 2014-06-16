@@ -7,13 +7,56 @@
 
     <script type="text/javascript">
         Rally.onReady(function () {
+                (function () {
+  var Ext = window.Ext4 || window.Ext;
+
+  Ext.define('Rally.ui.renderer.template.FormattedIDTemplate2', {
+    override: 'Rally.ui.renderer.template.FormattedIDTemplate',
+
+    createIcon: function(data){
+      console.log('showIcon', this.showIcon, data);
+      if (this.showIcon === false) {
+        return '';
+      }
+      var className = '';
+      switch (data._type.toLowerCase().split('/')[0]) {
+        case 'userstory':
+          case 'hierarchicalrequirement':
+          className = 'story';
+          break;
+        case 'defect':
+          className = 'defect';
+          break;
+        case 'task':
+          className = 'task';
+          break;
+        case 'testcase':
+          className = 'test-case';
+          break;
+        case 'defectsuite':
+          className = 'defect-suite';
+          break;
+        case 'testset':
+          className = 'test-set';
+          break;
+        case 'portfolioitem':
+          className = 'portfolioitem';
+          break;
+      }
+
+      console.log(className);
+      return className ? '<span class="artifact-icon icon-' + className + '"></span>' : className;
+    }
+  });
+}());
+
                 (function() {
   var Ext = window.Ext4 || window.Ext;
 
   /**
-   *      * @private
-   *           * Adds a component that allows the user to choose which artifact types are displayed on a GridBoard
-   *                */
+   * @private
+   * Adds a component that allows the user to choose which artifact types are displayed on a GridBoard
+   */
   Ext.define('Rally.ui.gridboard.plugin.GridBoardPortfolioItemTypeChooser', {
     alias: 'plugin.rallygridboardportfolioitemtypechooser',
     extend: 'Ext.AbstractPlugin',
@@ -29,7 +72,6 @@
     },
 
     getControlCmpConfig: function () {
-      console.log('getConfig');
       var me = this;
 
       return {
@@ -37,7 +79,6 @@
         listeners: {
           scope: me,
           change: function (t, newVal, oldVal, eOpts) {
-            //console.dir(t.store.getAt(t.store.find('_ref', newVal)));
             if (oldVal) {
               this._changeTopLevelPI(t.store.getAt(t.store.find('_ref', newVal)));
             }
@@ -50,7 +91,6 @@
       var gridOrBoard = this.cmp.getGridOrBoard();
       var type = typeRec.get('TypePath');
 
-      console.log(this.cmp.getToggleState());
       if (this.cmp.getToggleState() === 'grid') {
         gridOrBoard.store.parentTypes = [type];
         gridOrBoard.refresh();
@@ -274,7 +314,7 @@
 
     onBeforeExpandNode: function (node, eOpts) {
       this.expandingNode = node;
-      //console.log('expanding', node);
+      console.log('expanding', node);
     },
 
     isHierarchyEnabled: function() {
