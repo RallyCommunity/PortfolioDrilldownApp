@@ -27,9 +27,7 @@
         listeners: {
           scope: me,
           change: function (t, newVal, oldVal, eOpts) {
-            if (oldVal) {
-              this._changeTopLevelPI(t.store.getAt(t.store.find('_ref', newVal)));
-            }
+            this._changeTopLevelPI(t.store.getAt(t.store.find('_ref', newVal)));
           }
         }
       };

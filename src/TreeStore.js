@@ -213,7 +213,7 @@
 
     onBeforeExpandNode: function (node, eOpts) {
       this.expandingNode = node;
-      console.log('expanding', node);
+      //console.log('expanding', node);
     },
 
     isHierarchyEnabled: function() {

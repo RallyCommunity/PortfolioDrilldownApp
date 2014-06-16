@@ -85,8 +85,7 @@
           this._getGridStore().then({
             success: function(gridStore) {
               var model = gridStore.model;
-              //gridStore.parentTypes = [_.last(this.sModelNames)];
-              gridStore.parentTypes = ['portfolioitem/feature'];
+              gridStore.parentTypes = [_.last(this.sModelNames)];
               this._addGridBoard(gridStore);
               gridStore.load();
             },
@@ -293,7 +292,7 @@
     },
 
     _getGridColumns: function (columns) {
-      var result = ['FormattedID', 'Name', 'State', 'ScheduleState', 'Blocked', 'PlanEstimate', 'Owner', 'Discussion'];
+      var result = ['FormattedID', 'Name', 'State', 'PercentDoneByStoryPlanEstimate', 'ScheduleState', 'Blocked', 'PlanEstimate', 'Owner', 'Discussion'];
 
       if (columns) {
         result = columns;

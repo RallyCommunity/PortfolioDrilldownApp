@@ -28,20 +28,12 @@
       config.storeType = 'Rally.data.wsapi.TreeStore';
 
       return this.callParent([config]);
-      //.then({
-        //success: function (store) {
-          //console.log('parentTypes', config.parentTypes);
-          //store.parentTypes = config.parentTypes;
-          //return store;
-        //}
-      //});
     },
 
     loadModels: function(config) {
       return this.callParent([config]).then({
         success: function(models) {
           var pis = [];
-          //console.log('success', models);
 
           _.each(models, function (model) {
             if (model.isPortfolioItem()) {
@@ -50,15 +42,12 @@
               pis[model.ordinal] = model;
 
               if (model.isLowestLevelPortfolioItem()) {
-                console.log('is lowest pi');
-                console.dir(model);
                 Rally.data.wsapi.TreeStore.expandedCollectionNames[model.typePath] = ['UserStories'];
                 Rally.data.wsapi.TreeStore.parentChildTypeMap[model.typePath] = [{ typePath: 'hierarchicalrequirement', collectionName: 'UserStories' }];
               }
             }
           });
 
-          console.log('pis', pis);
           _.each(pis, function (model) {
             if (!model) { return; }
             var pm = pis[model.ordinal + 1];
@@ -67,10 +56,6 @@
               Rally.data.wsapi.TreeStore.parentChildTypeMap[pm.typePath] = [{ typePath: model.typePath, collectionName: 'Children' }];
             }
           });
-
-          //console.log('loaded.....');
-          //console.dir(Rally.data.wsapi.TreeStore);
-          //console.log('.........done');
 
           return this._setupTreeModel(this._getComponentModels(models), config);
         },
