@@ -1218,8 +1218,8 @@
         enableRanking: this.getContext().getWorkspace().WorkspaceConfiguration.DragDropRankingEnabled,
         columnCfgs: null, //must set this to null to offset default behaviors in the gridboard
         defaultColumnCfgs: this._getGridColumns(),
-        //showSummary: true,
-        //summaryColumns: this._getSummaryColumnConfig(),
+        showSummary: true,
+        summaryColumns: this._getSummaryColumnConfig(),
         //treeColumnRenderer: function (value, metaData, record, rowIdx, colIdx, store, view) {
           //store = store.treeStore || store;
           //return Rally.ui.renderer.RendererFactory.getRenderTemplate(store.model.getField('FormattedID')).apply(record.data);
@@ -1240,19 +1240,29 @@
 
       return [
         {
-        field: 'PlanEstimate',
+        field: 'AcceptedLeafStoryCount',
+        type: 'sum',
+        units: 'Total'
+      },
+      {
+        field: 'AcceptedLeafStoryPlanEstimateTotal',
         type: 'sum',
         units: planEstimateUnitName
       },
       {
-        field: 'TaskEstimateTotal',
+        field: 'LeafStoryCount',
         type: 'sum',
-        units: taskUnitName
+        units: 'Total'
       },
       {
-        field: 'TaskRemainingTotal',
+        field: 'LeafStoryPlanEstimateTotal',
         type: 'sum',
-        units: taskUnitName
+        units: planEstimateUnitName
+      },
+      {
+        field: 'UnEstimatedLeafStoryCount',
+        type: 'sum',
+        units: 'Total'
       }
       ];
     },
