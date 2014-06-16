@@ -85,8 +85,8 @@
           this._getGridStore().then({
             success: function(gridStore) {
               var model = gridStore.model;
-              gridStore.parentTypes = [_.last(this.sModelNames)];
-              //gridStore.parentTypes = ['portfolioitem/feature'];
+              //gridStore.parentTypes = [_.last(this.sModelNames)];
+              gridStore.parentTypes = ['portfolioitem/feature'];
               this._addGridBoard(gridStore);
               gridStore.load();
             },
@@ -114,13 +114,11 @@
         remoteSort: true,
         root: {expanded: true},
         //filters: [],
-        parentTypes: ['portfolioitem/theme'],
         enableHierarchy: true
       };
 
       return Ext.create('Rally.data.wsapi.TreeStoreBuilder').build(config).then({
         success: function (store) {
-          store.parentTypes = ['portfolioitem/theme'];
           return store;
         }
       });
@@ -152,36 +150,11 @@
         context: context,
         plugins: this._getGridBoardPlugins(),
         modelNames: this._getModelNames(),
-        //cardBoardConfig: {
-        //serverSideFiltering: context.isFeatureEnabled('BETA_TRACKING_EXPERIENCE'),
-        //plugins: [
-        //{ptype: 'rallycardboardprinting', pluginId: 'print'},
-        //{ptype: 'rallyfixedheadercardboard'}
-        //],
-        //storeConfig: {
-        //useShallowFetch: true
-        //},
-        //columnConfig: {
-        //xtype: 'iterationtrackingboardcolumn',
-        //additionalFetchFields: ['PortfolioItem'],
-        //enableInfiniteScroll: this.getContext().isFeatureEnabled('S64257_ENABLE_INFINITE_SCROLL_ALL_BOARDS'),
-        //plugins: [{
-        //ptype: 'rallycolumnpolicy',
-        //app: this
-        //}]
-        //},
-        //cardConfig: {
-        //showAge: this.getSetting('showCardAge') ? this.getSetting('cardAgeThreshold') : -1
-        //},
-        //listeners: {
-        //filter: this._onBoardFilter,
-        //filtercomplete: this._onBoardFilterComplete
-        //}
-        //},
         gridConfig: this._getGridConfig(gridStore),
         addNewPluginConfig: {
           style: {
-            'float': 'left'
+            'float': 'left',
+            'margin-right': '5px'
           }
         },
         listeners: {
@@ -242,6 +215,8 @@
         boardFieldDefaults: (this.getSetting('cardFields') && this.getSetting('cardFields').split(',')) ||
           ['Parent', 'Tasks', 'Defects', 'Discussion', 'PlanEstimate', 'Iteration']
       });
+
+      plugins.push('rallygridboardportfolioitemtypechooser');
 
       return plugins;
     },

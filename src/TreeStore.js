@@ -95,7 +95,8 @@
 
       getChildModelTypePaths: function(parentTypes) {
         //console.log('gcmtp', parentTypes);
-        return _.reduce(parentTypes, function(childTypes, parentType) {
+        return _.reduce(Ext.Array.from(parentTypes), function(childTypes, parentType) {
+          //console.log(childTypes, parentType, this.parentChildTypeMap[parentType]);
           return _.union(childTypes, _.pluck(this.parentChildTypeMap[parentType], "typePath"));
         }, [], this);
       }
@@ -264,6 +265,7 @@
         //console.log('PI -> US');
         parentFieldNames = ['PortfolioItem'];
       }
+      //console.log('pfn after', parentFieldNames);
 
       return parentFieldNames;
     },
@@ -299,6 +301,7 @@
           //console.log('returning parentTypes', this.parentTypes);
           return this.parentTypes;
         }
+        //console.log('gct', this.getExpandingNodeTypePath(), this.self.getChildModelTypePaths(this.getExpandingNodeTypePath()), this.self.expandedCollectionNames);
 
         return this.self.getChildModelTypePaths(Ext.Array.from(this.getExpandingNodeTypePath()));
       }
@@ -318,10 +321,16 @@
 
     _getCollectionFetchNames: function() {
       var collectionFetchNames = [];
-      _.each(Ext.Array.from(this.getChildTypes()), function(type) {
-        collectionFetchNames = _.union(collectionFetchNames, _.pluck(this.self.parentChildTypeMap[type], "collectionName"));
-      },this);
-      //console.log('cfn', collectionFetchNames);
+      // Honestly not sure why I need to do this :)
+      if (this.isRootNode(this.expandingNode)) {
+        _.each(Ext.Array.from(this.parentTypes), function (type) {
+          collectionFetchNames = _.union(collectionFetchNames, this.self.expandedCollectionNames[type]);
+        }, this);
+      } else {
+        _.each(Ext.Array.from(this.getChildTypes()), function(type) {
+          collectionFetchNames = _.union(collectionFetchNames, _.pluck(this.self.parentChildTypeMap[type], "collectionName"));
+        },this);
+      }
       return collectionFetchNames;
     },
 
@@ -737,6 +746,8 @@
       //console.log(this.self.expandedCollectionNames, typePath, this.self.expandedCollectionNames[typePath]);
 
       return _.reduce(expandedCollectionNames, function(accumulator, collectionName) {
+        //console.log(collectionName, record.get(collectionName));
+        //console.dir(record);
         var collectionVal = record.get(collectionName);
         if (collectionVal && collectionVal.Count) {
           accumulator += collectionVal.Count;

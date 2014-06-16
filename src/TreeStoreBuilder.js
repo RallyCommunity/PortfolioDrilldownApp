@@ -50,12 +50,15 @@
               pis[model.ordinal] = model;
 
               if (model.isLowestLevelPortfolioItem()) {
+                console.log('is lowest pi');
+                console.dir(model);
                 Rally.data.wsapi.TreeStore.expandedCollectionNames[model.typePath] = ['UserStories'];
                 Rally.data.wsapi.TreeStore.parentChildTypeMap[model.typePath] = [{ typePath: 'hierarchicalrequirement', collectionName: 'UserStories' }];
               }
             }
           });
 
+          console.log('pis', pis);
           _.each(pis, function (model) {
             if (!model) { return; }
             var pm = pis[model.ordinal + 1];

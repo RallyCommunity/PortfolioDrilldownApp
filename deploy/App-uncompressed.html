@@ -10,6 +10,58 @@
                 (function() {
   var Ext = window.Ext4 || window.Ext;
 
+  /**
+   *      * @private
+   *           * Adds a component that allows the user to choose which artifact types are displayed on a GridBoard
+   *                */
+  Ext.define('Rally.ui.gridboard.plugin.GridBoardPortfolioItemTypeChooser', {
+    alias: 'plugin.rallygridboardportfolioitemtypechooser',
+    extend: 'Ext.AbstractPlugin',
+    mixins: [
+      'Rally.ui.gridboard.plugin.GridBoardControlShowable',
+      'Ext.util.Observable'
+    ],
+
+    init: function (cmp) {
+      this.cmp = cmp;
+
+      this.showControl();
+    },
+
+    getControlCmpConfig: function () {
+      console.log('getConfig');
+      var me = this;
+
+      return {
+        xtype: 'rallyportfolioitemtypecombobox',
+        listeners: {
+          scope: me,
+          change: function (t, newVal, oldVal, eOpts) {
+            //console.dir(t.store.getAt(t.store.find('_ref', newVal)));
+            if (oldVal) {
+              this._changeTopLevelPI(t.store.getAt(t.store.find('_ref', newVal)));
+            }
+          }
+        }
+      };
+    },
+
+    _changeTopLevelPI: function (typeRec) {
+      var gridOrBoard = this.cmp.getGridOrBoard();
+      var type = typeRec.get('TypePath');
+
+      console.log(this.cmp.getToggleState());
+      if (this.cmp.getToggleState() === 'grid') {
+        gridOrBoard.store.parentTypes = [type];
+        gridOrBoard.refresh();
+      }
+    }
+  });
+})();
+
+                (function() {
+  var Ext = window.Ext4 || window.Ext;
+
   var wsapiMaxPageSize = 200;
 
   /**
@@ -104,7 +156,8 @@
 
       getChildModelTypePaths: function(parentTypes) {
         //console.log('gcmtp', parentTypes);
-        return _.reduce(parentTypes, function(childTypes, parentType) {
+        return _.reduce(Ext.Array.from(parentTypes), function(childTypes, parentType) {
+          //console.log(childTypes, parentType, this.parentChildTypeMap[parentType]);
           return _.union(childTypes, _.pluck(this.parentChildTypeMap[parentType], "typePath"));
         }, [], this);
       }
@@ -273,6 +326,7 @@
         //console.log('PI -> US');
         parentFieldNames = ['PortfolioItem'];
       }
+      //console.log('pfn after', parentFieldNames);
 
       return parentFieldNames;
     },
@@ -308,6 +362,7 @@
           //console.log('returning parentTypes', this.parentTypes);
           return this.parentTypes;
         }
+        //console.log('gct', this.getExpandingNodeTypePath(), this.self.getChildModelTypePaths(this.getExpandingNodeTypePath()), this.self.expandedCollectionNames);
 
         return this.self.getChildModelTypePaths(Ext.Array.from(this.getExpandingNodeTypePath()));
       }
@@ -327,10 +382,16 @@
 
     _getCollectionFetchNames: function() {
       var collectionFetchNames = [];
-      _.each(Ext.Array.from(this.getChildTypes()), function(type) {
-        collectionFetchNames = _.union(collectionFetchNames, _.pluck(this.self.parentChildTypeMap[type], "collectionName"));
-      },this);
-      //console.log('cfn', collectionFetchNames);
+      // Honestly not sure why I need to do this :)
+      if (this.isRootNode(this.expandingNode)) {
+        _.each(Ext.Array.from(this.parentTypes), function (type) {
+          collectionFetchNames = _.union(collectionFetchNames, this.self.expandedCollectionNames[type]);
+        }, this);
+      } else {
+        _.each(Ext.Array.from(this.getChildTypes()), function(type) {
+          collectionFetchNames = _.union(collectionFetchNames, _.pluck(this.self.parentChildTypeMap[type], "collectionName"));
+        },this);
+      }
       return collectionFetchNames;
     },
 
@@ -746,6 +807,8 @@
       //console.log(this.self.expandedCollectionNames, typePath, this.self.expandedCollectionNames[typePath]);
 
       return _.reduce(expandedCollectionNames, function(accumulator, collectionName) {
+        //console.log(collectionName, record.get(collectionName));
+        //console.dir(record);
         var collectionVal = record.get(collectionName);
         if (collectionVal && collectionVal.Count) {
           accumulator += collectionVal.Count;
@@ -828,12 +891,15 @@
               pis[model.ordinal] = model;
 
               if (model.isLowestLevelPortfolioItem()) {
+                console.log('is lowest pi');
+                console.dir(model);
                 Rally.data.wsapi.TreeStore.expandedCollectionNames[model.typePath] = ['UserStories'];
                 Rally.data.wsapi.TreeStore.parentChildTypeMap[model.typePath] = [{ typePath: 'hierarchicalrequirement', collectionName: 'UserStories' }];
               }
             }
           });
 
+          console.log('pis', pis);
           _.each(pis, function (model) {
             if (!model) { return; }
             var pm = pis[model.ordinal + 1];
@@ -994,8 +1060,8 @@
           this._getGridStore().then({
             success: function(gridStore) {
               var model = gridStore.model;
-              gridStore.parentTypes = [_.last(this.sModelNames)];
-              //gridStore.parentTypes = ['portfolioitem/feature'];
+              //gridStore.parentTypes = [_.last(this.sModelNames)];
+              gridStore.parentTypes = ['portfolioitem/feature'];
               this._addGridBoard(gridStore);
               gridStore.load();
             },
@@ -1023,13 +1089,11 @@
         remoteSort: true,
         root: {expanded: true},
         //filters: [],
-        parentTypes: ['portfolioitem/theme'],
         enableHierarchy: true
       };
 
       return Ext.create('Rally.data.wsapi.TreeStoreBuilder').build(config).then({
         success: function (store) {
-          store.parentTypes = ['portfolioitem/theme'];
           return store;
         }
       });
@@ -1061,36 +1125,11 @@
         context: context,
         plugins: this._getGridBoardPlugins(),
         modelNames: this._getModelNames(),
-        //cardBoardConfig: {
-        //serverSideFiltering: context.isFeatureEnabled('BETA_TRACKING_EXPERIENCE'),
-        //plugins: [
-        //{ptype: 'rallycardboardprinting', pluginId: 'print'},
-        //{ptype: 'rallyfixedheadercardboard'}
-        //],
-        //storeConfig: {
-        //useShallowFetch: true
-        //},
-        //columnConfig: {
-        //xtype: 'iterationtrackingboardcolumn',
-        //additionalFetchFields: ['PortfolioItem'],
-        //enableInfiniteScroll: this.getContext().isFeatureEnabled('S64257_ENABLE_INFINITE_SCROLL_ALL_BOARDS'),
-        //plugins: [{
-        //ptype: 'rallycolumnpolicy',
-        //app: this
-        //}]
-        //},
-        //cardConfig: {
-        //showAge: this.getSetting('showCardAge') ? this.getSetting('cardAgeThreshold') : -1
-        //},
-        //listeners: {
-        //filter: this._onBoardFilter,
-        //filtercomplete: this._onBoardFilterComplete
-        //}
-        //},
         gridConfig: this._getGridConfig(gridStore),
         addNewPluginConfig: {
           style: {
-            'float': 'left'
+            'float': 'left',
+            'margin-right': '5px'
           }
         },
         listeners: {
@@ -1151,6 +1190,8 @@
         boardFieldDefaults: (this.getSetting('cardFields') && this.getSetting('cardFields').split(',')) ||
           ['Parent', 'Tasks', 'Defects', 'Discussion', 'PlanEstimate', 'Iteration']
       });
+
+      plugins.push('rallygridboardportfolioitemtypechooser');
 
       return plugins;
     },
