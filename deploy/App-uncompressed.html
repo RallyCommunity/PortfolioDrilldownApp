@@ -269,6 +269,13 @@
      */
     childLevelSorters: [],
 
+    /**
+     * @cfg {Boolean}
+     *
+     * False to have expanding nodes ignore Project Scope settings.
+     */
+    expandingNodesRespectProjectScoping: true,
+
     _getModelFromTypePath: function (typePath) {
       if (!this.modelTypePathMap) {
         this.modelTypePathMap = _.transform(this.models, function (r, m) { r[m.typePath] = m; }, {}, this);
@@ -504,7 +511,12 @@
 
       options.useShallowFetch = true;
       options.fetch = options.fetch || this._buildFetch(this.fetch, this.model);
-      options.context = this.context;
+      if (this.expandingNodesRespectProjectScoping) {
+        options.context = this.context;
+      } else {
+        options.context = this.context;
+        options.context.project = null;
+      }
       options.requester = this;
 
       if (options.clearOnLoad === false) {
