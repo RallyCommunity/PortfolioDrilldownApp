@@ -254,14 +254,14 @@
       }
 
       //console.log('pfn', parentFieldNames);
-      var entp = this.getExpandingNodeTypePath();
+      var entp = this.getExpandingNodeTypePath().toLowerCase();
 
       if (entp === 'hierarchicalrequirement') {
         //console.log('US -> US');
         parentFieldNames = _.difference(parentFieldNames, ['PortfolioItem']);
       }
 
-      if (this.getExpandingNodeTypePath().indexOf('portfolioitem') >= 0 && _.contains(this.getChildTypes(), 'hierarchicalrequirement')) {
+      if (entp.indexOf('portfolioitem') >= 0 && _.contains(this.getChildTypes(), 'hierarchicalrequirement')) {
         //console.log('PI -> US');
         parentFieldNames = ['PortfolioItem'];
       }
@@ -324,7 +324,7 @@
       // Honestly not sure why I need to do this :)
       if (this.isRootNode(this.expandingNode)) {
         _.each(Ext.Array.from(this.parentTypes), function (type) {
-          collectionFetchNames = _.union(collectionFetchNames, this.self.expandedCollectionNames[type]);
+          collectionFetchNames = _.union(collectionFetchNames, this.self.expandedCollectionNames[type.toLowerCase()]);
         }, this);
       } else {
         _.each(Ext.Array.from(this.getChildTypes()), function(type) {
