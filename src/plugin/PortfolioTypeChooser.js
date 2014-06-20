@@ -38,15 +38,7 @@
       var type = typeRec.get('TypePath');
 
       if (this.cmp.getToggleState() === 'grid') {
-        if (gridOrBoard.store.isLoading()) {
-          gridOrBoard.store.on('load', function () {
-            gridOrBoard.store.parentTypes = [type];
-            gridOrBoard.refresh();
-          }, this, { single: true });
-        } else  {
-          gridOrBoard.store.parentTypes = [type];
-          gridOrBoard.refresh();
-        }
+        gridOrBoard.store.setParentTypes([type]);
       }
     }
   });

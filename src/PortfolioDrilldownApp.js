@@ -85,9 +85,16 @@
           this._getGridStore().then({
             success: function(gridStore) {
               var model = gridStore.model;
-              gridStore.parentTypes = [_.last(this.sModelNames)];
               this._addGridBoard(gridStore);
-              gridStore.load();
+              gridStore.on('parenttypeschange', function () {
+                if (gridStore.isLoading()) {
+                  gridStore.on('load', function () {
+                    gridStore.reload();
+                  }, this, { single: true });
+                } else {
+                  gridStore.load();
+                }
+              }, this);
             },
             scope: this
           });
@@ -113,7 +120,8 @@
         remoteSort: true,
         root: {expanded: true},
         //filters: [],
-        enableHierarchy: true
+        enableHierarchy: true,
+        expandingNodesRespectProjectScoping: false
       };
 
       return Ext.create('Rally.data.wsapi.TreeStoreBuilder').build(config).then({

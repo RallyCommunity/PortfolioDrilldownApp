@@ -211,7 +211,9 @@
          * @event currentPageReset
          * Fires when the store determines that the current page needs to be reset to the first page of results
          */
-        'currentPageReset'
+        'currentPageReset',
+
+        'parenttypeschange'
       );
 
       this._decorateModels();
@@ -230,6 +232,11 @@
     setRootNode: function(root, preventLoad) {
       this.tree.on('rootchange', this._decorateModels, this, {single: true});
       this.callParent([root, preventLoad || !this.autoLoad]);
+    },
+
+    setParentTypes: function (parentTypes) {
+      this.parentTypes = Ext.Array.from(parentTypes);
+      this.fireEvent('parenttypeschange', this.parentTypes);
     },
 
     remove: function(records) {
@@ -406,10 +413,13 @@
 
       options.useShallowFetch = true;
       options.fetch = options.fetch || this._buildFetch(this.fetch, this.model);
-      if (this.expandingNodesRespectProjectScoping) {
+      if (this.expandingNodesRespectProjectScoping || this.isRootNode(this.expandingNode)) {
         options.context = this.context;
       } else {
         options.context = this.context;
+        if (!options.context) {
+          options.context = Rally.getApp().getContext().getDataContext();
+        }
         options.context.project = null;
       }
       options.requester = this;
