@@ -62,6 +62,7 @@
         fieldLabel: 'Show Children in any Project'
       });
 
+      console.log(fields);
       return fields;
     },
 
