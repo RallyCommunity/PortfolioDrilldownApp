@@ -1079,7 +1079,7 @@
       var fields = this.callParent(arguments);
       fields.push({
         name: 'ignoreProjectScoping',
-        type: 'rallycheckbox',
+        xtype: 'rallycheckboxfield',
         label: 'Show Children in any Project'
       });
 
@@ -1147,9 +1147,8 @@
         autoLoad: false,
         remoteSort: true,
         root: {expanded: true},
-        //filters: [],
         enableHierarchy: true,
-        expandingNodesRespectProjectScoping: this.getSetting('ignoreProjectScoping')
+        expandingNodesRespectProjectScoping: !this.getSetting('ignoreProjectScoping')
       };
 
       return Ext.create('Rally.data.wsapi.TreeStoreBuilder').build(config).then({
