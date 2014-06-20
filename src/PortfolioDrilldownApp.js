@@ -62,7 +62,6 @@
         label: 'Show Children in any Project'
       });
 
-      console.log(fields);
       return fields;
     },
 
@@ -127,7 +126,6 @@
         autoLoad: false,
         remoteSort: true,
         root: {expanded: true},
-        //filters: [],
         enableHierarchy: true,
         expandingNodesRespectProjectScoping: !this.getSetting('ignoreProjectScoping')
       };
