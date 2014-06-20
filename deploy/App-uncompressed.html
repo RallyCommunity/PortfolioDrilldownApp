@@ -1150,7 +1150,7 @@
         root: {expanded: true},
         //filters: [],
         enableHierarchy: true,
-        expandingNodesRespectProjectScoping: this.getSetting('ignoreProjectScoping')
+        expandingNodesRespectProjectScoping: !this.getSetting('ignoreProjectScoping')
       };
 
       return Ext.create('Rally.data.wsapi.TreeStoreBuilder').build(config).then({
