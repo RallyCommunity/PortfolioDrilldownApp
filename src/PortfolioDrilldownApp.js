@@ -58,8 +58,8 @@
       var fields = this.callParent(arguments);
       fields.push({
         name: 'ignoreProjectScoping',
-        type: 'rallycheckboxfield',
-        fieldLabel: 'Show Children in any Project'
+        xtype: 'rallycheckboxfield',
+        label: 'Show Children in any Project'
       });
 
       console.log(fields);
