@@ -59,7 +59,7 @@
       fields.push({
         name: 'ignoreProjectScoping',
         type: 'rallycheckboxfield',
-        label: 'Show Children in any Project'
+        fieldLabel: 'Show Children in any Project'
       });
 
       return fields;
