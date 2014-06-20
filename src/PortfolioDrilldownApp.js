@@ -47,11 +47,23 @@
 
     config: {
       defaultSettings: {
+        ignoreProjectScoping: true
       }
     },
 
     eModelNames: ['User Story', 'Defect', 'Defect Suite', 'Test Set'],
     sModelNames: [],
+
+    getSettingsFields: function () {
+      var fields = this.callParent(arguments);
+      fields.push({
+        name: 'ignoreProjectScoping',
+        type: 'rallycheckbox',
+        label: 'Show Children in any Project'
+      });
+
+      return fields;
+    },
 
     launch: function() {
       if(!this.rendered) {
@@ -103,11 +115,6 @@
 
     },
 
-    getSettingsFields: function () {
-      var fields = this.callParent(arguments);
-      return fields;
-    },
-
     _getModelNames: function () {
       return _.union(this.sModelNames, this.eModelNames);
     },
@@ -121,7 +128,7 @@
         root: {expanded: true},
         //filters: [],
         enableHierarchy: true,
-        expandingNodesRespectProjectScoping: false
+        expandingNodesRespectProjectScoping: this.getSetting('ignoreProjectScoping')
       };
 
       return Ext.create('Rally.data.wsapi.TreeStoreBuilder').build(config).then({
