@@ -15,6 +15,8 @@ years ago. The new version includes the features of the old App plus:
 * Improved Column Chooser
 * Themed like the rest of Rally
 
+![Screenshot](https://cloud.githubusercontent.com/assets/701752/3347615/719fe6a4-f8ee-11e3-8169-21a2f8401983.png)
+
 ## License
 
 PortfolioDrilldownApp is released under the MIT license.  See the file [LICENSE](./LICENSE) for the full text.
