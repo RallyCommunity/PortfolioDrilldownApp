@@ -218,6 +218,9 @@
 
       this._decorateModels();
       this.on('beforeexpand', this.onBeforeExpandNode, this);
+      this.on('load', function () {
+        this.expandingNode = null;
+      }, this);
     },
 
     onBeforeExpandNode: function (node, eOpts) {
@@ -300,6 +303,8 @@
     getExpandingNodeTypePath: function () {
       var r = this.parentTypes[0];
 
+      //console.log('this.expandingNode', this.expandingNode);
+      //console.log('isRoot', this.isRootNode(this.expandingNode));
       if (this.expandingNode && !this.isRootNode(this.expandingNode)) {
         r = this.expandingNode.get('_type');
       }
@@ -413,8 +418,14 @@
 
       options.useShallowFetch = true;
       options.fetch = options.fetch || this._buildFetch(this.fetch, this.model);
+      //console.log('options', options);
+      //console.log('gENTY', this.getExpandingNodeTypePath());
+      //console.log('pT', this.parentTypes);
+      //console.log(_.contains(this.parentTypes, this.getExpandingNodeTypePath()));
 
-      if (this.expandingNodesRespectProjectScoping || _.contains(this.parentTypes, this.getExpandingNodeTypePath())) {
+      if (this.expandingNodesRespectProjectScoping ||
+          this.isRootNode(this.expandingNode) ||
+         (_.contains(this.parentTypes, this.getExpandingNodeTypePath()) && !this.expandingNode)) {
         options.context = this.context;
       } else {
         options.context = this.context;
