@@ -235,7 +235,7 @@
     },
 
     setParentTypes: function (parentTypes) {
-      this.parentTypes = Ext.Array.from(parentTypes);
+      this.parentTypes = _.map(Ext.Array.from(parentTypes), function (t) { return t.toLowerCase(); });
       this.fireEvent('parenttypeschange', this.parentTypes);
     },
 
@@ -413,7 +413,8 @@
 
       options.useShallowFetch = true;
       options.fetch = options.fetch || this._buildFetch(this.fetch, this.model);
-      if (this.expandingNodesRespectProjectScoping || this.isRootNode(this.expandingNode)) {
+
+      if (this.expandingNodesRespectProjectScoping || _.contains(this.parentTypes, this.getExpandingNodeTypePath())) {
         options.context = this.context;
       } else {
         options.context = this.context;
