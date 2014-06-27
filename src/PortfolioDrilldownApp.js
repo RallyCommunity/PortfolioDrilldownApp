@@ -62,7 +62,16 @@
         label: 'Show Children in any Project'
       });
 
+      fields.push({
+        type: 'query'
+      });
+
       return fields;
+    },
+
+    onTimeboxScopeChanged: function (timebox) {
+      this.callParent(arguments);
+
     },
 
     launch: function() {
@@ -93,6 +102,7 @@
         scope: this,
         callback: function (records) {
           this.sModelNames = _.map(records, function (rec) { return rec.get('TypePath'); });
+          this.sModelMap = _.transform(records, function (acc, rec) { acc[rec.get('TypePath')] = rec; }, {});
 
           this._getGridStore().then({
             success: function(gridStore) {
@@ -120,15 +130,22 @@
     },
 
     _getGridStore: function() {
+      var query = [];
+
+     if (this.getSetting('query')) {
+       query.push(Rally.data.wsapi.Filter.fromQueryString(this.getSetting('query')));
+     }
+
       var context = this.getContext(),
-      config = {
-        models: this._getModelNames(),
-        autoLoad: false,
-        remoteSort: true,
-        root: {expanded: true},
-        enableHierarchy: true,
-        expandingNodesRespectProjectScoping: !this.getSetting('ignoreProjectScoping')
-      };
+          config = {
+            models: this._getModelNames(),
+            autoLoad: false,
+            remoteSort: true,
+            filters: query,
+            root: {expanded: true},
+            enableHierarchy: true,
+            expandingNodesRespectProjectScoping: !this.getSetting('ignoreProjectScoping')
+          };
 
       return Ext.create('Rally.data.wsapi.TreeStoreBuilder').build(config).then({
         success: function (store) {
@@ -136,20 +153,6 @@
         }
       });
     },
-
-    //_addStatsBanner: function() {
-    //this.remove('statsBanner');
-    //this.add({
-    //xtype: 'statsbanner',
-    //itemId: 'statsBanner',
-    //context: this.getContext(),
-    //margin: '0 0 5px 0',
-    //listeners: {
-    //resize: this._resizeGridBoardToFillSpace,
-    //scope: this
-    //}
-    //});
-    //},
 
     _addGridBoard: function (gridStore) {
       var context = this.getContext();
@@ -186,9 +189,6 @@
      */
     getAvailableGridBoardHeight: function() {
       var height = this.getHeight();
-      //if(this.down('#statsBanner').rendered) {
-        //height -= this.down('#statsBanner').getHeight();
-      //}
       return height;
     },
 
